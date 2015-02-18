@@ -2232,16 +2232,11 @@ struct wiphy_vendor_command {
  *	supports for ACL.
  * @country_ie_pref: country IE processing preferences specified
  *	by enum nl80211_country_ie_pref
- *
  * @vendor_commands: array of vendor commands supported by the hardware
  * @n_vendor_commands: number of vendor commands
  * @vendor_events: array of vendor events supported by the hardware
  * @n_vendor_events: number of vendor events
  *
- * @max_ap_assoc_sta: maximum number of associated stations supported in AP mode
- *	(including P2P GO) or 0 to indicate no such limit is advertised. The
- *	driver is allowed to advertise a theoretical limit that it can reach in
- *	some cases, but may not always reach.
  */
 struct wiphy {
 	/* assign these fields before you register the wiphy */
@@ -2349,8 +2344,6 @@ struct wiphy {
 	const struct wiphy_vendor_command *vendor_commands;
 	const struct nl80211_vendor_cmd_info *vendor_events;
 	int n_vendor_commands, n_vendor_events;
-
-	u16 max_ap_assoc_sta;
 
 	char priv[0] __attribute__((__aligned__(NETDEV_ALIGN)));
 };
@@ -3293,8 +3286,8 @@ void __cfg80211_send_event_skb(struct sk_buff *skb, gfp_t gfp);
 static inline struct sk_buff *
 cfg80211_vendor_cmd_alloc_reply_skb(struct wiphy *wiphy, int approxlen)
 {
-	return __cfg80211_alloc_reply_skb(wiphy, NL80211_CMD_TESTMODE,
-					  NL80211_ATTR_TESTDATA, approxlen);
+	return __cfg80211_alloc_reply_skb(wiphy, NL80211_CMD_VENDOR,
+					  NL80211_ATTR_VENDOR_DATA, approxlen);
 }
 
 /**

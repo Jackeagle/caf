@@ -647,12 +647,6 @@
  *	(&struct nl80211_vendor_cmd_info) of the supported vendor commands.
  *	This may also be sent as an event with the same attributes.
  *
- * @NL80211_CMD_SET_QOS_MAP: Set Interworking QoS mapping for IP DSCP values.
- *	The QoS mapping information is included in %NL80211_ATTR_QOS_MAP. If
- *	that attribute is not included, QoS mapping is disabled. Since this
- *	QoS mapping is relevant for IP packets, it is only valid during an
- *	association. This is cleared on disassociation and AP restart.
- *
  * @NL80211_CMD_MAX: highest used command number
  * @__NL80211_CMD_AFTER_LAST: internal use
  */
@@ -822,8 +816,6 @@ enum nl80211_commands {
 	NL80211_CMD_CHANNEL_SWITCH,
 
 	NL80211_CMD_VENDOR,
-
-	NL80211_CMD_SET_QOS_MAP,
 
 	/* add new commands above here */
 
@@ -1808,15 +1800,6 @@ enum nl80211_attrs {
 
 	NL80211_ATTR_VENDOR_EVENTS,
 
-	NL80211_ATTR_QOS_MAP,
-
-	NL80211_ATTR_MAC_HINT,
-	NL80211_ATTR_WIPHY_FREQ_HINT,
-
-	NL80211_ATTR_MAX_AP_ASSOC_STA,
-
-	NL80211_ATTR_TDLS_PEER_CAPABILITY,
-
 	/* add attributes here, update the policy in nl80211.c */
 
 	__NL80211_ATTR_AFTER_LAST,
@@ -1862,7 +1845,7 @@ enum nl80211_attrs {
 #define NL80211_HT_CAPABILITY_LEN		26
 #define NL80211_VHT_CAPABILITY_LEN		12
 
-#define NL80211_MAX_NR_CIPHER_SUITES		5
+#define NL80211_MAX_NR_CIPHER_SUITES		6
 #define NL80211_MAX_NR_AKM_SUITES		2
 
 /**
@@ -2743,6 +2726,7 @@ enum nl80211_mfp {
 enum nl80211_wpa_versions {
 	NL80211_WPA_VERSION_1 = 1 << 0,
 	NL80211_WPA_VERSION_2 = 1 << 1,
+	NL80211_WAPI_VERSION_1 = 1 << 2,
 };
 
 /**
@@ -3298,22 +3282,6 @@ enum nl80211_crit_proto_id {
 struct nl80211_vendor_cmd_info {
 	__u32 vendor_id;
 	__u32 subcmd;
-};
-
-/**
- * enum nl80211_tdls_peer_capability - TDLS peer flags.
- *
- * Used by tdls_mgmt() to determine which conditional elements need
- * to be added to TDLS Setup frames.
- *
- * @NL80211_TDLS_PEER_HT: TDLS peer is HT capable.
- * @NL80211_TDLS_PEER_VHT: TDLS peer is VHT capable.
- * @NL80211_TDLS_PEER_WMM: TDLS peer is WMM capable.
- */
-enum nl80211_tdls_peer_capability {
-	NL80211_TDLS_PEER_HT = 1<<0,
-	NL80211_TDLS_PEER_VHT = 1<<1,
-	NL80211_TDLS_PEER_WMM = 1<<2,
 };
 
 #endif /* __LINUX_NL80211_H */

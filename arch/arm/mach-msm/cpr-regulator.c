@@ -213,7 +213,6 @@ struct cpr_regulator {
 	int		*corner_map;
 	u32		num_corners;
 	int		*quot_adjust;
-
 	bool		is_cpr_suspended;
 };
 
@@ -338,6 +337,8 @@ static void cpr_ctl_enable(struct cpr_regulator *cpr_vreg, int corner)
 {
 	u32 val;
 	int fuse_corner = cpr_vreg->corner_map[corner];
+	if (cpr_vreg->is_cpr_suspended)
+		return;
 
 	if (cpr_vreg->is_cpr_suspended)
 		return;
@@ -887,10 +888,10 @@ static int cpr_resume(struct cpr_regulator *cpr_vreg)
 {
 	cpr_debug("resume\n");
 
+	cpr_irq_clr(cpr_vreg);
 	mutex_lock(&cpr_vreg->cpr_mutex);
 
 	cpr_vreg->is_cpr_suspended = false;
-	cpr_irq_clr(cpr_vreg);
 
 	enable_irq(cpr_vreg->cpr_irq);
 	cpr_ctl_enable(cpr_vreg, cpr_vreg->corner);

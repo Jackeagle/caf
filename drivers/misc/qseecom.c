@@ -43,6 +43,9 @@
 #include <mach/socinfo.h>
 #include <mach/qseecomi.h>
 #include <asm/cacheflush.h>
+#ifdef CONFIG_SEC_DEBUG
+#include <mach/sec_debug.h>
+#endif
 #include "qseecom_legacy.h"
 #include "qseecom_kernel.h"
 
@@ -3412,6 +3415,8 @@ static long qseecom_ioctl(struct file *file, unsigned cmd,
 			ret = -EINVAL;
 			break;
 		}
+		pr_debug("%s : Perf Enable ioctl (Process:%s PID:%d)\n", __func__, \
+				current->comm, current->pid);
 		atomic_inc(&data->ioctl_count);
 		if (qseecom.support_bus_scaling) {
 			mutex_lock(&qsee_bw_mutex);
@@ -3443,6 +3448,8 @@ static long qseecom_ioctl(struct file *file, unsigned cmd,
 			ret = -EINVAL;
 			break;
 		}
+		pr_debug("%s : Perf Disable ioctl (Process:%s PID:%d)\n", __func__, \
+				current->comm, current->pid);
 		atomic_inc(&data->ioctl_count);
 		if (!qseecom.support_bus_scaling) {
 			qsee_disable_clock_vote(data, CLK_DFAB);
@@ -4034,6 +4041,9 @@ static int __devinit qseecom_probe(struct platform_device *pdev)
 				req.size = resource_size(resource);
 				pr_warn("secure app region addr=0x%x size=0x%x",
 							req.addr, req.size);
+#ifdef CONFIG_SEC_DEBUG
+				sec_debug_secure_app_addr_size(req.addr, req.size);
+#endif
 			} else {
 				pr_err("Fail to get secure app region info\n");
 				rc = -EINVAL;

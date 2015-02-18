@@ -1430,7 +1430,7 @@ static int _qcrypto_process_ahash(struct crypto_engine *pengine,
 static int _qcrypto_process_aead(struct  crypto_engine *pengine,
 				struct crypto_async_request *async_req)
 {
-	struct qce_req qreq;
+	struct qce_req qreq = {0};
 	int ret = 0;
 	struct qcrypto_cipher_req_ctx *rctx;
 	struct qcrypto_cipher_ctx *cipher_ctx;
@@ -3788,34 +3788,16 @@ static int  _qcrypto_probe(struct platform_device *pdev)
 		return rc;
 	}
 
-	platform_set_drvdata(pdev, pengine);
-	pengine->qce = handle;
-	pengine->pcp = cp;
-	pengine->pdev = pdev;
-	pengine->req = NULL;
-
-	pengine->high_bw_req_count = 0;
-	pengine->high_bw_req = false;
-	init_timer(&(pengine->bw_scale_down_timer));
-	INIT_WORK(&pengine->low_bw_req_ws, qcrypto_low_bw_req_work);
-	pengine->bw_scale_down_timer.function =
-			qcrypto_bw_scale_down_timer_callback;
-
-	device_init_wakeup(&pengine->pdev->dev, true);
-
-	tasklet_init(&pengine->done_tasklet, req_done, (unsigned long)pengine);
-	crypto_init_queue(&pengine->req_queue, 50);
-
-	mutex_lock(&cp->engine_lock);
-	cp->total_units++;
-	pengine->unit = cp->total_units;
-
-	spin_lock_irqsave(&cp->lock, flags);
-	list_add_tail(&pengine->elist, &cp->engine_list);
-	cp->next_engine = pengine;
-	spin_unlock_irqrestore(&cp->lock, flags);
-
-	qce_hw_support(pengine->qce, &cp->ce_support);
+	INIT_LIST_HEAD(&cp->alg_list);
+	platform_set_drvdata(pdev, cp);
+	spin_lock_init(&cp->lock);
+	tasklet_init(&cp->done_tasklet, req_done, (unsigned long)cp);
+	crypto_init_queue(&cp->queue, 50);
+	cp->qce = handle;
+	cp->pdev = pdev;
+	rc = qce_hw_support(cp->qce, &cp->ce_support);
+	if(rc < 0)
+		return rc;
 	if (cp->ce_support.bam)	 {
 		cp->platform_support.ce_shared = cp->ce_support.is_shared;
 		cp->platform_support.shared_ce_resource = 0;
