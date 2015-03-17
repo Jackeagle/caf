@@ -500,11 +500,7 @@ static int __devinit pil_pronto_probe(struct platform_device *pdev)
 	drv->subsys_desc.wdog_bite_handler = wcnss_wdog_bite_irq_hdlr;
 
 	INIT_DELAYED_WORK(&drv->cancel_vote_work, wcnss_post_bootup);
-<<<<<<< HEAD
-	INIT_WORK(&drv->wcnss_wdog_bite_work, wcnss_wdog_bite_work_hdlr);
-=======
         INIT_WORK(&drv->wcnss_wdog_bite_work, wcnss_wdog_bite_work_hdlr);
->>>>>>> 12a6c0c... Merge in SM-G800H_SKZ_KK_Opensource
 
 	drv->subsys = subsys_register(&drv->subsys_desc);
 	if (IS_ERR(drv->subsys)) {
